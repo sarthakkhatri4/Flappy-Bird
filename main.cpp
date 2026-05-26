@@ -17,22 +17,19 @@ class Ground {
         
         
     }
-    // Vector2 block2 = {450, GetRenderHeight() - (150/991.0)*GetRenderHeight()};
-    // Vector2 block3 = {900, GetRenderHeight() - (150/991.0)*GetRenderHeight()};
-    // Vector2 block4 = {1350, GetRenderHeight() - (150/991.0)*GetRenderHeight()};
-    // Vector2 block5 = {1800, GetRenderHeight() - (150/991.0)*GetRenderHeight()};
-    // Vector2 block6 = {2250, GetRenderHeight() - (150/991.0)*GetRenderHeight()};
 };
 
 class Bird{
     public:
     Vector2 position = {480.0f - 13.0f, 421.5f - 24.5f};
+    float velocity = 0.0f;
+    float jumpforce = -10.0f;
 };
 
 class UpTube{
     public:
     float speedOfTube = 5;
-    Vector2 position = {1000, 0};
+    Vector2 position;
 };
 
 int main(){
@@ -42,7 +39,8 @@ int main(){
     
     int ScreenWidth = 1920;
     int ScreenHeight = 991;
-    int gravity = -3; 
+    float gravity = 0.4f; 
+    // bool birdShouldRise = false;
     
     InitWindow(ScreenWidth, ScreenHeight, "Flappy Bird");
     // ToggleFullscreen();
@@ -76,11 +74,12 @@ int main(){
     Bird birdPng;
 
     UpTube tube1;
+    UpTube tube2;
+    UpTube tube2;
+    UpTube tube3;
 
+    // tube1.position = {(float)GetRenderWidth(), }
 
-
-     
-    
     // MaximizeWindow();
     
     // cout << IsWindowFullscreen() ;
@@ -94,15 +93,18 @@ int main(){
         Block6.update();
         Block7.update();
 
-        if(IsKeyPressed(KEY_UP) == false){
-            birdPng.position.y -= gravity; 
+        
+        birdPng.velocity += gravity; 
+            
+        
 
+        if(IsKeyPressed(KEY_UP) == true){
+            birdPng.velocity = birdPng.jumpforce;
         }
 
-        if(IsKeyDown(KEY_UP) == true){
-            birdPng.position.y -= -100/(2*gravity) ; 
-        }
-
+        birdPng.position.y += birdPng.velocity; 
+        
+        
         // int currentWidth = GetRenderWidth();
         int currentHeight = GetRenderHeight();
 
@@ -129,7 +131,7 @@ int main(){
 
         DrawTextureV(bird, birdPng.position, WHITE);
 
-        DrawTextureV(Tube, tube1.position, WHITE);
+        // DrawTextureV(Tube, tube1.position, WHITE);
         
         
         
