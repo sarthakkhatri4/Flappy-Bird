@@ -31,6 +31,8 @@ class UpTube{
     inline static float speedOfTube = 0;
     Vector2 position = {1920.0f, 0.0f};
 
+    bool isPassed = false;
+
     void update(){
         position.x -= speedOfTube;
 
@@ -58,6 +60,9 @@ int main(){
     float gravity = 0.0;
     bool gameOver = true;
     bool isCollision = false;
+    
+    int score = 0;
+    
     
     InitWindow(ScreenWidth, ScreenHeight, "Flappy Bird");
     // ToggleFullscreen();
@@ -122,6 +127,9 @@ int main(){
 
         }
 
+        string scoreChar = to_string(score);
+        string* scoreCharPtr = &scoreChar;
+
         if(isCollision == true){
             gameOver = true;
             birdPng.velocity = 0.0f;
@@ -181,7 +189,10 @@ int main(){
             if(CheckCollisionRecs(upPipeBox, birdBox) || CheckCollisionRecs(downPipeBox, birdBox)){
                 isCollision = true;
             }
-            
+            if(upTubes[i].position.x <= birdPng.position.x && upTubes[i].isPassed == false){
+                upTubes[i].isPassed = true;
+                score += 1;
+            }
             
         }
 
@@ -202,6 +213,8 @@ int main(){
 
                 upTubes[i].position.y = x1;
                 downTubes[i].position.y = x2;
+
+                upTubes[i].isPassed = false;
             }
             
         }
@@ -239,6 +252,8 @@ int main(){
         DrawTextureV(ground, Block7.block, WHITE );
 
         DrawTextureV(bird, birdPng.position, WHITE);
+
+        DrawText(scoreCharPtr->c_str(), 1920/2 - 40, 20, 80, BLACK);
 
         
         EndDrawing();
