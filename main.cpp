@@ -23,13 +23,30 @@ class Bird{
     public:
     Vector2 position = {480.0f - 13.0f, 421.5f - 24.5f};
     float velocity = 0.0f;
-    float jumpforce = -10.0f;
+    float jumpforce = -9.5f;
 };
 
 class UpTube{
     public:
     float speedOfTube = 5;
-    Vector2 position;
+    // Vector2 position = {0.0f, (float)(GetRandomValue(100, 320) - 320)};
+    Vector2 position = {1920.0f, 0.0f};
+
+    void update(){
+        position.x -= speedOfTube;
+
+    }
+
+};
+
+class DownTube{
+    public:
+    float speedOfTube = 5;
+    Vector2 position = {1920.0f, 480.0f};
+
+    void update(){
+        position.x -= speedOfTube;
+    }
 };
 
 int main(){
@@ -50,7 +67,8 @@ int main(){
     Texture2D ground = LoadTexture("images/ground5.png");
     Texture2D background = LoadTexture("images/background5.png");
     Texture2D bird = LoadTexture("images/bird2.png");
-    Texture2D Tube = LoadTexture("images/tube1.png"); 
+    Texture2D upTube = LoadTexture("images/uptube2.png"); 
+    Texture2D downTube = LoadTexture("images/downtube.png");
 
     SetWindowIcon(birdImage);
     UnloadImage(birdImage);
@@ -73,17 +91,65 @@ int main(){
 
     Bird birdPng;
 
-    UpTube tube1;
-    UpTube tube2;
-    UpTube tube2;
-    UpTube tube3;
-
-    // tube1.position = {(float)GetRenderWidth(), }
-
-    // MaximizeWindow();
+    const int numTubes = 7;
     
-    // cout << IsWindowFullscreen() ;
+    UpTube upTubes[numTubes];
+    DownTube downTubes[numTubes];
+
+    for(int i = 0; i<numTubes; i++){
+        upTubes[i].position.x = 1920.0f + 300*i;
+        downTubes[i].position.x = 1920.0f + 300*i;
+
+        float x1 = (float)GetRandomValue(-493, -30);
+        float x2 = (593 + x1) + 180;
+
+        upTubes[i].position.y = x1;
+        downTubes[i].position.y = x2;
+    }
+
+
+    // UpTube upTube1;
+    // UpTube upTube2;
+    // UpTube upTube3;
+    // UpTube upTube4;
+    // UpTube upTube5;
+    // UpTube upTube6;
+
+    // upTube1.position.x = 1920.0f;
+    // upTube2.position.x = 2220.0f;
+    // upTube3.position.x = 2520.0f;
+    // upTube4.position.x = 2820.0f;
+    // upTube5.position.x = 3120.0f;
+    // upTube6.position.x = 3420.0f;
+
+    
+    // DownTube downTube1;
+    // DownTube downTube2;
+    // DownTube downTube3;
+    // DownTube downTube4;
+    // DownTube downTube5;
+    // DownTube downTube6;
+
+    // downTube1.position.x = 1920.0f;
+    // downTube2.position.x = 2220.0f;
+    // downTube3.position.x = 2520.0f;
+    // downTube4.position.x = 2820.0f;
+    // downTube5.position.x = 3120.0f;
+    // downTube6.position.x = 3420.0f;
+
+    // float timer = 0.0f;
+
     while(WindowShouldClose() == false){
+
+        // timer += GetFrameTime();
+        
+        // if(timer >= 1.0f){
+        //     upTube1.speedOfTube = -5;
+
+        //     timer -= 1.0f;
+        // }
+
+
 
         Block1.update();
         Block2.update();
@@ -93,11 +159,61 @@ int main(){
         Block6.update();
         Block7.update();
 
+        // upTube1.update();
+        // upTube2.update();
+        // upTube3.update();
+        // upTube4.update();
+        // upTube5.update();
+        // upTube6.update();
+
+        // downTube1.update();
+        // downTube2.update();
+        // downTube3.update();
+        // downTube4.update();
+        // downTube5.update();
+        // downTube6.update();
+
+        for(int i=0; i<numTubes; i++){
+            upTubes[i].update();
+            downTubes[i].update();
+        }
+
+        for(int i = 0; i<numTubes; i++){
+            if(upTubes[i].position.x <= -76){
+                if(i == 0){
+                    upTubes[i].position.x = upTubes[6].position.x + 300;
+                    downTubes[i].position.x = downTubes[6].position.x + 300;
+
+                }
+                else{
+                    upTubes[i].position.x = upTubes[i-1].position.x + 300;
+                    downTubes[i].position.x = downTubes[i-1].position.x + 300;
+                }
+
+                float x1 = (float)GetRandomValue(-493, -30);
+                float x2 = (593 + x1) + 180;
+
+                upTubes[i].position.y = x1;
+                downTubes[i].position.y = x2;
+            }
+
+        }
+
+        // for(int i = 0; i<numTubes; i++){
+        //     if(upTubes[i].position.x == 1920.0f){
+        //         float x1 = (float)GetRandomValue(-493, -30);
+        //         float x2 = (593 + x1) + 180;
+
+        //         upTubes[i].position.y = x1;
+        //         downTubes[i].position.y = x2;
+        //     }
+        // }
+
+
         
         birdPng.velocity += gravity; 
             
         
-
         if(IsKeyPressed(KEY_UP) == true){
             birdPng.velocity = birdPng.jumpforce;
         }
@@ -110,16 +226,30 @@ int main(){
 
         BeginDrawing();
         ClearBackground(BLACK);
-        // DrawText(TextFormat("True Width: %d", currentWidth), 50, 50, 40, GREEN);
-        // DrawText(TextFormat("True Height: %d", currentHeight), 50, 100, 40, GREEN);
         
-        // DrawTexture(ground, 0, currentHeight - (150/991.0)*currentHeight, WHITE);
-        // DrawTexture(ground, 450, currentHeight - (150/991.0)*currentHeight, WHITE);
-        // DrawTexture(ground, 900, currentHeight - (150/991.0)*currentHeight, WHITE);
-        // DrawTexture(ground, 1350, currentHeight - (150/991.0)*currentHeight, WHITE);
-        // DrawTexture(ground, 1800, currentHeight - (150/991.0)*currentHeight, WHITE);
-        // DrawTexture(ground, 2250, currentHeight - (150/991.0)*currentHeight, WHITE);
         DrawTexture(background, 0, currentHeight-(843+(150/991.0f)*currentHeight), WHITE);
+
+        for(int i = 0; i<numTubes; i++){
+            DrawTextureV(upTube, upTubes[i].position, WHITE);
+            DrawTextureV(downTube, downTubes[i].position, WHITE);
+
+        }
+        
+        // DrawTextureV(upTube, upTube1.position, WHITE);
+        // DrawTextureV(upTube, upTube2.position, WHITE);
+        // DrawTextureV(upTube, upTube3.position, WHITE);
+        // DrawTextureV(upTube, upTube4.position, WHITE);
+        // DrawTextureV(upTube, upTube5.position, WHITE);
+        // DrawTextureV(upTube, upTube6.position, WHITE);
+
+
+        // DrawTextureV(downTube, downTube1.position, WHITE);
+        // DrawTextureV(downTube, downTube2.position, WHITE);
+        // DrawTextureV(downTube, downTube3.position, WHITE);
+        // DrawTextureV(downTube, downTube4.position, WHITE);
+        // DrawTextureV(downTube, downTube5.position, WHITE);
+        // DrawTextureV(downTube, downTube6.position, WHITE);
+
 
         DrawTextureV(ground, Block1.block, WHITE );
         DrawTextureV(ground, Block2.block, WHITE );
@@ -131,18 +261,12 @@ int main(){
 
         DrawTextureV(bird, birdPng.position, WHITE);
 
-        // DrawTextureV(Tube, tube1.position, WHITE);
-        
-        
         
         EndDrawing();
 
     }
     
     CloseWindow();
-    // int height = GetScreenHeight();
-    // int width = GetScreenWidth();
-    // cout << height << " "<< width;
     
     return 0;
 }
