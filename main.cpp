@@ -5,7 +5,7 @@ using namespace std;
 
 class Ground {
     public:
-    float speedOfGround = 5;
+    inline static float speedOfGround = 0;
     Vector2 block = {0.0f, 0.0f};
     void update(){
         block.y = (float)GetRenderHeight() - ((150/991.0f)*GetRenderHeight());
@@ -23,13 +23,12 @@ class Bird{
     public:
     Vector2 position = {480.0f - 13.0f, 421.5f - 24.5f};
     float velocity = 0.0f;
-    float jumpforce = -9.5f;
+    float jumpforce = -6.0f;
 };
 
 class UpTube{
     public:
-    float speedOfTube = 5;
-    // Vector2 position = {0.0f, (float)(GetRandomValue(100, 320) - 320)};
+    inline static float speedOfTube = 0;
     Vector2 position = {1920.0f, 0.0f};
 
     void update(){
@@ -41,7 +40,7 @@ class UpTube{
 
 class DownTube{
     public:
-    float speedOfTube = 5;
+    inline static float speedOfTube = 0;
     Vector2 position = {1920.0f, 480.0f};
 
     void update(){
@@ -56,8 +55,9 @@ int main(){
     
     int ScreenWidth = 1920;
     int ScreenHeight = 991;
-    float gravity = 0.4f; 
-    // bool birdShouldRise = false;
+    float gravity = 0.0;
+    bool gameOver = true;
+    bool isCollision = false;
     
     InitWindow(ScreenWidth, ScreenHeight, "Flappy Bird");
     // ToggleFullscreen();
@@ -72,6 +72,8 @@ int main(){
 
     SetWindowIcon(birdImage);
     UnloadImage(birdImage);
+
+    
 
     Ground Block1;
     Ground Block2;
@@ -100,56 +102,49 @@ int main(){
         upTubes[i].position.x = 1920.0f + 300*i;
         downTubes[i].position.x = 1920.0f + 300*i;
 
-        float x1 = (float)GetRandomValue(-493, -30);
-        float x2 = (593 + x1) + 180;
+        float x1 = (float)GetRandomValue(-493, -100);
+        float x2 = (593 + x1) + 250;
 
         upTubes[i].position.y = x1;
         downTubes[i].position.y = x2;
     }
 
 
-    // UpTube upTube1;
-    // UpTube upTube2;
-    // UpTube upTube3;
-    // UpTube upTube4;
-    // UpTube upTube5;
-    // UpTube upTube6;
-
-    // upTube1.position.x = 1920.0f;
-    // upTube2.position.x = 2220.0f;
-    // upTube3.position.x = 2520.0f;
-    // upTube4.position.x = 2820.0f;
-    // upTube5.position.x = 3120.0f;
-    // upTube6.position.x = 3420.0f;
-
-    
-    // DownTube downTube1;
-    // DownTube downTube2;
-    // DownTube downTube3;
-    // DownTube downTube4;
-    // DownTube downTube5;
-    // DownTube downTube6;
-
-    // downTube1.position.x = 1920.0f;
-    // downTube2.position.x = 2220.0f;
-    // downTube3.position.x = 2520.0f;
-    // downTube4.position.x = 2820.0f;
-    // downTube5.position.x = 3120.0f;
-    // downTube6.position.x = 3420.0f;
-
-    // float timer = 0.0f;
-
     while(WindowShouldClose() == false){
 
-        // timer += GetFrameTime();
-        
-        // if(timer >= 1.0f){
-        //     upTube1.speedOfTube = -5;
 
-        //     timer -= 1.0f;
-        // }
+        if(IsKeyPressed(KEY_SPACE) == true && gameOver == true){
+            gameOver = false;
+            Ground::speedOfGround = 5;
+            UpTube::speedOfTube = 5;
+            DownTube::speedOfTube = 5;
+            gravity = 0.25f; 
 
+        }
 
+        if(isCollision == true){
+            gameOver = true;
+            birdPng.velocity = 0.0f;
+
+        }
+        if(birdPng.position.y <= 0){
+            gameOver = true;
+            birdPng.position.y = 0;
+            birdPng.velocity = 0.0f;
+        }
+
+        if(birdPng.position.y >=843-49){
+            gameOver = true;
+            birdPng.position.y = 843-49;
+            birdPng.velocity = 0.0f;
+        }
+
+        if(gameOver == true){
+            Ground::speedOfGround = 0;
+            UpTube::speedOfTube = 0;
+            DownTube::speedOfTube = 0;
+            gravity = 0.0f; 
+        }
 
         Block1.update();
         Block2.update();
@@ -159,23 +154,35 @@ int main(){
         Block6.update();
         Block7.update();
 
-        // upTube1.update();
-        // upTube2.update();
-        // upTube3.update();
-        // upTube4.update();
-        // upTube5.update();
-        // upTube6.update();
-
-        // downTube1.update();
-        // downTube2.update();
-        // downTube3.update();
-        // downTube4.update();
-        // downTube5.update();
-        // downTube6.update();
 
         for(int i=0; i<numTubes; i++){
             upTubes[i].update();
             downTubes[i].update();
+
+            Rectangle upPipeBox = {
+                upTubes[i].position.x,
+                upTubes[i].position.y,
+                76,
+                593
+            };
+
+            Rectangle downPipeBox = {
+                downTubes[i].position.x,
+                downTubes[i].position.y,
+                76,
+                593
+            };
+            Rectangle birdBox = {
+                birdPng.position.x,
+                birdPng.position.y,
+                68,
+                49
+            };
+            if(CheckCollisionRecs(upPipeBox, birdBox) || CheckCollisionRecs(downPipeBox, birdBox)){
+                isCollision = true;
+            }
+            
+            
         }
 
         for(int i = 0; i<numTubes; i++){
@@ -190,31 +197,19 @@ int main(){
                     downTubes[i].position.x = downTubes[i-1].position.x + 300;
                 }
 
-                float x1 = (float)GetRandomValue(-493, -30);
-                float x2 = (593 + x1) + 180;
+                float x1 = (float)GetRandomValue(-493, -100);
+                float x2 = (593 + x1) + 250;
 
                 upTubes[i].position.y = x1;
                 downTubes[i].position.y = x2;
             }
-
+            
         }
-
-        // for(int i = 0; i<numTubes; i++){
-        //     if(upTubes[i].position.x == 1920.0f){
-        //         float x1 = (float)GetRandomValue(-493, -30);
-        //         float x2 = (593 + x1) + 180;
-
-        //         upTubes[i].position.y = x1;
-        //         downTubes[i].position.y = x2;
-        //     }
-        // }
-
-
         
         birdPng.velocity += gravity; 
             
         
-        if(IsKeyPressed(KEY_UP) == true){
+        if(IsKeyPressed(KEY_UP) == true && gameOver == false){
             birdPng.velocity = birdPng.jumpforce;
         }
 
@@ -234,22 +229,6 @@ int main(){
             DrawTextureV(downTube, downTubes[i].position, WHITE);
 
         }
-        
-        // DrawTextureV(upTube, upTube1.position, WHITE);
-        // DrawTextureV(upTube, upTube2.position, WHITE);
-        // DrawTextureV(upTube, upTube3.position, WHITE);
-        // DrawTextureV(upTube, upTube4.position, WHITE);
-        // DrawTextureV(upTube, upTube5.position, WHITE);
-        // DrawTextureV(upTube, upTube6.position, WHITE);
-
-
-        // DrawTextureV(downTube, downTube1.position, WHITE);
-        // DrawTextureV(downTube, downTube2.position, WHITE);
-        // DrawTextureV(downTube, downTube3.position, WHITE);
-        // DrawTextureV(downTube, downTube4.position, WHITE);
-        // DrawTextureV(downTube, downTube5.position, WHITE);
-        // DrawTextureV(downTube, downTube6.position, WHITE);
-
 
         DrawTextureV(ground, Block1.block, WHITE );
         DrawTextureV(ground, Block2.block, WHITE );
