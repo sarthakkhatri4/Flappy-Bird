@@ -65,6 +65,7 @@ int main(){
     
     
     InitWindow(ScreenWidth, ScreenHeight, "Flappy Bird");
+    InitAudioDevice();
     // ToggleFullscreen();
     SetTargetFPS(60);
 
@@ -74,6 +75,10 @@ int main(){
     Texture2D bird = LoadTexture("images/bird2.png");
     Texture2D upTube = LoadTexture("images/uptube2.png"); 
     Texture2D downTube = LoadTexture("images/downtube.png");
+
+    Sound hit = LoadSound("audio/hit.wav");
+    Sound wings = LoadSound("audio/wing.wav");
+    // Sound swooshing = LoadSound("audio/swooshing.wav");
 
     SetWindowIcon(birdImage);
     UnloadImage(birdImage);
@@ -120,6 +125,7 @@ int main(){
 
         if(IsKeyPressed(KEY_SPACE) == true && gameOver == true){
             gameOver = false;
+
             Ground::speedOfGround = 5;
             UpTube::speedOfTube = 5;
             DownTube::speedOfTube = 5;
@@ -133,25 +139,27 @@ int main(){
         if(isCollision == true){
             gameOver = true;
             birdPng.velocity = 0.0f;
+            // PlaySound(hit);
 
         }
         if(birdPng.position.y <= 0){
             gameOver = true;
             birdPng.position.y = 0;
             birdPng.velocity = 0.0f;
+            gravity = 0.0f; 
         }
 
         if(birdPng.position.y >=843-49){
             gameOver = true;
             birdPng.position.y = 843-49;
             birdPng.velocity = 0.0f;
+            gravity = 0.0f; 
         }
 
         if(gameOver == true){
             Ground::speedOfGround = 0;
             UpTube::speedOfTube = 0;
             DownTube::speedOfTube = 0;
-            gravity = 0.0f; 
         }
 
         Block1.update();
@@ -181,13 +189,16 @@ int main(){
                 593
             };
             Rectangle birdBox = {
-                birdPng.position.x,
-                birdPng.position.y,
-                68,
-                49
+                birdPng.position.x - 2,
+                birdPng.position.y - 2,
+                64,
+                45
             };
             if(CheckCollisionRecs(upPipeBox, birdBox) || CheckCollisionRecs(downPipeBox, birdBox)){
-                isCollision = true;
+                if(isCollision == false){
+                    isCollision = true;
+                    PlaySound(hit);
+                }
             }
             if(upTubes[i].position.x <= birdPng.position.x && upTubes[i].isPassed == false){
                 upTubes[i].isPassed = true;
@@ -224,6 +235,7 @@ int main(){
         
         if(IsKeyPressed(KEY_UP) == true && gameOver == false){
             birdPng.velocity = birdPng.jumpforce;
+            PlaySound(wings);
         }
 
         birdPng.position.y += birdPng.velocity; 
@@ -259,7 +271,10 @@ int main(){
         EndDrawing();
 
     }
-    
+    UnloadSound(hit);
+    UnloadSound(wings);
+
+    CloseAudioDevice();
     CloseWindow();
     
     return 0;
